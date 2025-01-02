@@ -9,12 +9,21 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import environ
+import os
 from pathlib import Path
+
+# .env 파일을 읽기 위한 객체 생성
+env = environ.Env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# env 파일을 읽습니다.
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+# env 파일로부터 rest api 키를 가져옵니다.
+KAKAO_REST_API_KEY = env('KAKAO_REST_API_KEY')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
