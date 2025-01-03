@@ -144,3 +144,9 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'usr.User' # usr의 User를 기본 auth 모델로 적용
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'social_auth.authentications.CustomAuthentication',
+    ),
+}
