@@ -5,5 +5,7 @@ from .views import KakaoCallback, RefreshTokens
 urlpatterns = [
     # 카카오 콜백 함수로 리다이렉트
     path('kakaoCallback/', KakaoCallback, name='kakao_callback'),
-    path('kakaoRefresh/', RefreshTokens.as_view(), name='kakao_refresh'),
+    path('kakaoRefresh/', RefreshTokens.as_view({
+        'post': 'create'
+    }), name='kakao_refresh'),
 ]
