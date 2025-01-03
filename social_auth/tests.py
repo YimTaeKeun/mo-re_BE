@@ -20,3 +20,18 @@ class AuthorizationTest(TestCase):
         response = self.client.post('/socialLogin/kakaoRefresh/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         print(response.json())
+        # 리프레시 토큰 정보를 body에서 발견하지 못한 경우를 테스트 합니다.
+        data = {
+            # 일부러 틀린 정보를 넣습니다.
+            'ref': '',
+        }
+        response = self.client.post('/socialLogin/kakaoRefresh/', data=data, content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        print(response.json())
+        # 토큰 정보 자체를 변환해서 테스트합니다.
+        data = {
+            'refresh_token': '1pbZZHeOq9TsJBPQgA-URNdOUoDlhxp__AAAAAgo9cusAAAGUKtVQgeQ1KlcE_6bt',
+        }
+        response = self.client.post('/socialLogin/kakaoRefresh/', data=data, content_type='application/json')
+        print(response.json())
+        self.assertEqual(response.status_code, 400)
