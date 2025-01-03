@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'social_auth'
+    'social_auth',
+    'usr',
 ]
 
 MIDDLEWARE = [
@@ -141,3 +142,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'usr.User' # usr의 User를 기본 auth 모델로 적용
