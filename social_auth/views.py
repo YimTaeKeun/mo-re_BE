@@ -43,7 +43,10 @@ def KakaoCallback(request):
             isNew = checkOrCreateUser(id_token)
         except Exception as e: # sub와 nickname 없는 오류 catch
             return JsonResponse({"Error": str(e)})
-        data = response.json().copy()
+        data = dict()
+        data['access_token'] = response.json().get('access_token', None) # 액세스 토큰 추가
+        data['token_type'] = response.json().get('token_type', None) # token 타입 정보 추가
+        data['refresh_token'] = response.json().get('refresh_token', None) # 리프레시 토큰 정보 추가
         data['isNew'] = isNew # 회원가입인지 로그인인지 확인하기 위한 용도
         return JsonResponse(data, status=200)
     return JsonResponse({"Error": response.text}, status=status.HTTP_400_BAD_REQUEST)
