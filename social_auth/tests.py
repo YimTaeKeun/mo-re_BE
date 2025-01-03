@@ -6,10 +6,13 @@ class AuthorizationTest(TestCase):
     # 로그인을 테스트합니다.
     def testLogin(self):
         # TODO 인가코드로서 매 테스트마다 바꿔줘야합니다.
-        code = 'fi2K_UU-vI9oZRwoq4ydjy4z9ucXkcke_LjHh7drkJ6IcX4KNOwZvQAAAAQKKcjZAAABlCrRuUi2W8wW6V7rJg'
+        code = 'VQVYusUaYZVELah55Ank5JI98IR-5pk7T-pSK77WxncXouTAz0KHLwAAAAQKPCQhAAABlCsU-eMe0jm_MNo9Pw'
         response = self.client.get('/socialLogin/kakaoCallback/?code=' + code)
         print(response.json())
         self.assertEqual(response.status_code, 200)
+        response = self.client.get('/socialLogin/kakaoCallback/?cod=' + code)
+        print(response.json())
+        self.assertEqual(response.status_code, 400)
 
     # 리프레시 토큰을 테스트합니다.
     def testRefresh(self):
