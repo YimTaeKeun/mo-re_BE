@@ -4,7 +4,11 @@ from django.shortcuts import render
 from config.settings import KAKAO_REST_API_KEY, BASE_URL
 from rest_framework import status, viewsets
 from rest_framework.response import Response
+from usr.models import User
+import jwt
+import logging
 # Create your views here.
+logger = logging.getLogger('django') # 로거 설정
 
 def KakaoCallback(request):
     # code는 카카오에서 제공받은 인가코드를 말합니다.
@@ -30,8 +34,40 @@ def KakaoCallback(request):
     response = requests.post(token_url, data=data, headers=headers)
     if response.status_code == 200:
         # TODO: 카카오 유저 정보를 처리합니다.
-        return JsonResponse(response.json(), status=200)
+        id_token = response.json().get('id_token', None)
+        # 아이디 토큰이 존재하지 않는다면 -> 예외처리
+        if id_token is None:
+            return JsonResponse({"Error": "id 토큰이 존재하지 않습니다.", "ErrorResponse": response.json()})
+        # 유저 확인
+        try:
+            isNew = checkOrCreateUser(id_token)
+        except Exception as e: # sub와 nickname 없는 오류 catch
+            return JsonResponse({"Error": str(e)})
+        data = response.json().copy()
+        data['isNew'] = isNew # 회원가입인지 로그인인지 확인하기 위한 용도
+        return JsonResponse(data, status=200)
     return JsonResponse({"Error": response.text}, status=status.HTTP_400_BAD_REQUEST)
+
+def checkOrCreateUser(id_token):
+    payload = jwt.decode(id_token, options={"verify_signature": False}) # id_token payload decode
+
+    sub = payload.get('sub', None) # 회원 고유 번호를 조회합니다.
+    username = payload.get('nickname', None) # 닉네임을 조회합니다.
+
+    if sub is None or username is None: # 회원 고유 번호 혹은 닉넴임을 조회할 수 없는 경우
+        raise Exception("회원 고유 번호 혹은 닉네임을 찾을 수 없습니다.")
+
+    try:
+        user = User.objects.get(sub=sub) # 유저가 있으면 아무 행동도 취하지 않습니다.
+        logger.info('회원번호 ' + str(sub) + ' ' + str(username) + '이(가) 로그인을 완료하였습니다.')
+    except User.DoesNotExist: # 유저가 없으므로 새로운 유저 생성
+        logger.info('회원번호 ' + str(sub) + ' ' + str(username) + '이(가) 회원가입을 완료하였습니다.')
+        User.objects.create(sub=sub,
+                            username=username)
+        return True # 회원가입인 경우
+    return False # 기존 회원 정보가 있어 단순 유저 로그인인 경우
+
+
 
 class RefreshTokens(viewsets.ViewSet):
 

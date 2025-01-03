@@ -6,7 +6,7 @@ class AuthorizationTest(TestCase):
     # 로그인을 테스트합니다.
     def testLogin(self):
         # TODO 인가코드로서 매 테스트마다 바꿔줘야합니다.
-        code = 'VQVYusUaYZVELah55Ank5JI98IR-5pk7T-pSK77WxncXouTAz0KHLwAAAAQKPCQhAAABlCsU-eMe0jm_MNo9Pw'
+        code = 'ojCllX-3oCmkfs-3rM9jqdDQ1PsntvsRc7ycBgjF2H4K_ACSJG1MjAAAAAQKPCQfAAABlCtKDKPgLMgnBn6ZSw'
         response = self.client.get('/socialLogin/kakaoCallback/?code=' + code)
         print(response.json())
         self.assertEqual(response.status_code, 200)
