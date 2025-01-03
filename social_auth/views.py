@@ -1,7 +1,7 @@
 import requests
 from django.http import JsonResponse
 from django.shortcuts import render
-from config.settings import KAKAO_REST_API_KEY, BASE_URL
+from config.settings import KAKAO_REST_API_KEY, CLIENT_BASE_URL
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from usr.models import User
@@ -18,7 +18,7 @@ def KakaoCallback(request):
         return JsonResponse({"Error": "인가 코드 추출 실패"}, status=status.HTTP_400_BAD_REQUEST)
     # 토큰을 발급받기위한 요청 url 입니다.
     token_url = 'https://kauth.kakao.com/oauth/token'
-    redirect_uri = BASE_URL + '/socialLogin/kakaoCallback/' # 인가 코드가 들어오는 url 즉 현 뷰의 url을 말합니다.
+    redirect_uri = CLIENT_BASE_URL + '/socialLogin/kakaoCallback/' # 인가 코드가 들어오는 url 즉 현 뷰의 url을 말합니다.
     # 요청 body
     data = {
         'grant_type': 'authorization_code',

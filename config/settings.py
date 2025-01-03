@@ -13,8 +13,8 @@ import environ
 import os
 from pathlib import Path
 
-BASE_URL = 'http://127.0.0.1:8000' # API 통신을 하기위한 서버의 BaseUrl을 말합니다. 해당 URL은 소셜 로그인 콜백 url로도 활용됩니다.
-
+CLIENT_BASE_URL = 'http://127.0.0.1:3000' # API 통신을 하기위한 클라이언트의 BaseUrl을 말합니다. 해당 URL은 소셜 로그인 콜백 url로도 활용됩니다.
+SERVER_BASE_URL = 'http://127.0.0.1:3000' # API 통신을 하기위한 서버의 BaseUrl을 말합니다.
 # .env 파일을 읽기 위한 객체 생성
 env = environ.Env()
 
