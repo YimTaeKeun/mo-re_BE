@@ -9,12 +9,23 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import environ
+import os
 from pathlib import Path
+
+BASE_URL = 'http://127.0.0.1:8000' # API 통신을 하기위한 서버의 BaseUrl을 말합니다. 해당 URL은 소셜 로그인 콜백 url로도 활용됩니다.
+
+# .env 파일을 읽기 위한 객체 생성
+env = environ.Env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# env 파일을 읽습니다.
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+# env 파일로부터 rest api 키를 가져옵니다.
+KAKAO_REST_API_KEY = env('KAKAO_REST_API_KEY')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -40,6 +51,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'social_auth',
+    'usr',
 ]
 
 MIDDLEWARE = [
@@ -129,3 +142,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'usr.User' # usr의 User를 기본 auth 모델로 적용
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'social_auth.authentications.CustomAuthentication',
+    ),
+}
