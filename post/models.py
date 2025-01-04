@@ -20,12 +20,12 @@ class Post(models.Model):
 
 class BombPost(models.Model):
     # id: pk이며, 폭파 번호를 의미합니다.
-    targetPost = models.ForeignKey(Post, on_delete=models.CASCADE) # 폭파를 할 게시물을 의미하며 pk를 받아옵니다.
+    targetPost = models.OneToOneField(Post, on_delete=models.CASCADE) # 폭파를 할 게시물을 의미하며 pk를 받아옵니다.
     bombTime = models.DateTimeField() # 폭파 예정 시간대를 의미합니다. 자동 추가가 아닌, 반드시 폭파 시간대를 받아와야 합니다. 해당 필드는 celery schedule을 통해 사용됩니다.
 
 class ReportPost(models.Model):
     # id: pk이며, 신고 등록 번호를 의미합니다.
     reason = models.TextField() # 신고 사유가 들어갑니다.
-    post = models.ForeignKey(Post, on_delete=models.CASCADE) # 신고당한 post를 의미하며 pk를 받아옵니다.
+    post = models.OneToOneField(Post, on_delete=models.CASCADE) # 신고당한 post를 의미하며 pk를 받아옵니다.
     addDate = models.DateTimeField(auto_now_add=True) # 신고 등록 날짜를 의미하며, 자동으로 시간이 등록됩니다.
 
