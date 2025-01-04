@@ -20,7 +20,8 @@ class Post(models.Model):
 
 class BombPost(models.Model):
     # id: pk이며, 폭파 번호를 의미합니다.
-    targetPost = models.OneToOneField(Post, on_delete=models.CASCADE) # 폭파를 할 게시물을 의미하며 pk를 받아옵니다.
+    # Post에서 참조하기 위해 related name을 bomb로 설정했습니다. (절대 건들지 마시오!!!)
+    targetPost = models.OneToOneField(Post, on_delete=models.CASCADE, related_name='bomb') # 폭파를 할 게시물을 의미하며 pk를 받아옵니다.
     bombTime = models.DateTimeField() # 폭파 예정 시간대를 의미합니다. 자동 추가가 아닌, 반드시 폭파 시간대를 받아와야 합니다. 해당 필드는 celery schedule을 통해 사용됩니다.
 
 class ReportPost(models.Model):
