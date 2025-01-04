@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'social_auth',
     'usr',
+    'post',
 ]
 
 MIDDLEWARE = [
