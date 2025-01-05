@@ -3,7 +3,10 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 # permission class import
-from usr.permissions import IsOwnerOrReadOnly
+from usr.permissions import (
+    IsOwnerOrReadOnly,
+    IsStaffOrReadOnly,
+)
 
 # model import
 from .models import (
@@ -14,7 +17,8 @@ from .models import (
 )
 # 시리얼라이저 import
 from .serializers import (
-    PostSerializer
+    PostSerializer,
+    PostCategorySerializer
 )
 
 # Create your views here.
@@ -62,3 +66,11 @@ class PostSimpleViewSet(viewsets.ModelViewSet):
     def get(self, request, *args, **kwargs):
         # list 메소드는 여러 인스턴스를 반환하는 메소드이므로 simple viewset에 적합합니다.
         return self.list(request, *args, **kwargs) # get 요청이 들어오는 즉시, list 메소드로 전환됩니다.
+
+# 카테고리 관련 뷰를 만듭니다.
+class PostCategoryViewSet(viewsets.ModelViewSet):
+    queryset = PostCategory.objects.all()
+    serializer_class = PostCategorySerializer
+    permission_classes = (IsStaffOrReadOnly,) # 관리자 권한을 가진 사용자만 카테고리를 등록, 삭제, 수정할 수 있습니다.
+
+

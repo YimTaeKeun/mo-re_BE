@@ -94,3 +94,17 @@ class PostTests(TestCase):
         # DELETE TEst
         response = self.client.delete('/post/detail/1/', headers=headers)
         self.assertEqual(response.status_code, 204)
+
+    def test_category(self):
+        headers = {'Authorization': 'Bearer ' + ACCESS_TOKEN}
+        data = {
+            'categoryName': 'Hello',
+        }
+        response = self.client.post('/post/categories/', data, headers=headers)
+        print(response.json())
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # 201 created 통과 -> 관리자 퍼미션 통과
+        # GET Test
+        response = self.client.get('/post/categories/', headers=headers)
+        print(response.json())
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

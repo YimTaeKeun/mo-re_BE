@@ -59,3 +59,7 @@ class PostSerializer(serializers.ModelSerializer):
 
         return instance
 
+class PostCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostCategory
+        fields = '__all__'

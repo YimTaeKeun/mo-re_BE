@@ -12,9 +12,10 @@ class IsOwnerOrReadOnly(BasePermission):
         )
 
 # 관리자만 접근하도록 허가하는 퍼미션 클래스 입니다.
-class IsStaff(BasePermission):
+class IsStaffOrReadOnly(BasePermission):
     def has_permission(self, request, view):
         return bool(
-            request.user and request.user.is_authenticated and # 인증된 사용자인가
-            request.user.is_staff # 그 인증된 사용자가 관리자인가
+            request.method in permissions.SAFE_METHODS or  # 읽기와 같은 안전모드에 있으면 통과
+            (request.user and request.user.is_authenticated and # 인증된 사용자인가
+            request.user.is_staff) # 그 인증된 사용자가 관리자인가
         )

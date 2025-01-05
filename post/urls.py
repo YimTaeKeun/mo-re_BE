@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import (
-    PostViewSet
+    PostViewSet,
+    PostCategoryViewSet
 )
 
 urlpatterns = [
@@ -11,5 +12,15 @@ urlpatterns = [
         'get': 'retrieve',
         'delete': 'destroy',
         'put': 'partial_update',
+    })),
+    # 카테고리 end point
+    path('categories/', PostCategoryViewSet.as_view({
+        'get': 'list',
+        'post': 'create',
+    })),
+    path('categories/<int:pk>/', PostCategoryViewSet.as_view({
+        'get': 'retrieve',
+        'put': 'update',
+        'delete': 'destroy',
     }))
 ]
