@@ -141,8 +141,24 @@ class PostTests(TestCase):
             'content': '댓글 내용2',
         }
         response = self.client.post('/post/comment/save/', data2, headers=headers)
+        comment_id = response.json().get('id')
         self.assertEqual(response.status_code, 201)
+
+        # 댓글 수정 테스트
+        data2 = {
+            'content': '댓글 내용3',
+        }
+        response = self.client.put(f'/post/comment/{comment_id}/', data2, headers=headers,
+                                   content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+
         # 게시물 가져오기 테스트
         response = self.client.get(f'/post/detail/{id}/', headers=headers)
         print(response.json())
         self.assertEqual(response.status_code, 200)
+
+        # 댓글 삭제 테스트
+        response = self.client.delete(f'/post/comment/{comment_id}/', headers=headers)
+        self.assertEqual(response.status_code, 204)
+
+
