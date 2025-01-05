@@ -7,7 +7,7 @@ from usr.models import User
 
 class PostCategory(models.Model):
     # id: 해당 모델의 pk로 카테고리 번호로 활용됩니다.
-    categoryName = models.CharField(max_length=50) # 카테고리 이름을 의미합니다.
+    categoryName = models.CharField(max_length=50, unique=True) # 카테고리 이름을 의미합니다.
     addDate = models.DateTimeField(auto_now_add=True) # 카테고리 추가 날짜와 시간을 의미합니다.
 
 class Post(models.Model):
@@ -20,12 +20,19 @@ class Post(models.Model):
 
 class BombPost(models.Model):
     # id: pk이며, 폭파 번호를 의미합니다.
-    targetPost = models.ForeignKey(Post, on_delete=models.CASCADE) # 폭파를 할 게시물을 의미하며 pk를 받아옵니다.
+    # Post에서 참조하기 위해 related name을 bomb로 설정했습니다. (절대 건들지 마시오!!!)
+    targetPost = models.OneToOneField(Post, on_delete=models.CASCADE, related_name='bomb') # 폭파를 할 게시물을 의미하며 pk를 받아옵니다.
     bombTime = models.DateTimeField() # 폭파 예정 시간대를 의미합니다. 자동 추가가 아닌, 반드시 폭파 시간대를 받아와야 합니다. 해당 필드는 celery schedule을 통해 사용됩니다.
 
 class ReportPost(models.Model):
     # id: pk이며, 신고 등록 번호를 의미합니다.
     reason = models.TextField() # 신고 사유가 들어갑니다.
-    post = models.ForeignKey(Post, on_delete=models.CASCADE) # 신고당한 post를 의미하며 pk를 받아옵니다.
+    post = models.OneToOneField(Post, on_delete=models.CASCADE) # 신고당한 post를 의미하며 pk를 받아옵니다.
     addDate = models.DateTimeField(auto_now_add=True) # 신고 등록 날짜를 의미하며, 자동으로 시간이 등록됩니다.
 
+class Comment(models.Model):
+    # id: pk이며, 댓글 번호를 의미합니다.
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    content = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    addDate = models.DateTimeField(auto_now_add=True)

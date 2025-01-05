@@ -12,6 +12,6 @@ class User(AbstractUser):
 
 class BlackListUser(models.Model):
     # id: pk로 리스트 등록 번호로 사용됩니다.
-    sub = models.ForeignKey(User, on_delete=models.CASCADE) # 등록 회원 번호를 말합니다.
+    sub = models.OneToOneField(User, on_delete=models.CASCADE) # 등록 회원 번호를 말합니다.
     addDate = models.DateTimeField(auto_now_add=True) # 등록 날짜와 시간을 말하며 자동으로 추가됩니다.
     reason = models.TextField() # 등록 사유 필드를 일컫습니다.
