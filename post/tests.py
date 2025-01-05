@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.test import TestCase
 from rest_framework import status
+from rest_framework.status import HTTP_403_FORBIDDEN
 
 from usr.models import User
 from .models import (
@@ -64,11 +65,11 @@ class PostTests(TestCase):
         print(response.json())
         self.assertEqual(response.status_code, 200)
 
-        # TODO 퍼미션 부여
+
         # Anonymous User Test
-        # response = self.client.get('/post/detail/1/')
-        # print(response.json())
-        # self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        response = self.client.get('/post/detail/1/')
+        print(response.json())
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
         # DELETE TEst
@@ -86,3 +87,11 @@ class PostTests(TestCase):
         }
         response = self.client.post('/post/detail/', data, headers=headers)
         self.assertEqual(response.status_code, 404)
+
+        # Anonymous POST Test
+        response = self.client.post('/post/detail/', data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Anonymous PUT Test
+        response = self.client.put('/post/detail/1/', data)
+        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
