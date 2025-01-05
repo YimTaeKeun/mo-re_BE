@@ -3,7 +3,8 @@ from .views import (
     PostViewSet,
     PostCategoryViewSet,
     CommentViewSet,
-    PostSimpleViewSet
+    PostSimpleViewSet,
+    ReportPostViewSet
 )
 
 urlpatterns = [
@@ -37,5 +38,9 @@ urlpatterns = [
     # 카테고리별 게시물 보기 end point
     path('all/<int:categoryId>/', PostSimpleViewSet.as_view({
         'get': 'list',
+    })),
+    # 신고 end point
+    path('report/', ReportPostViewSet.as_view({
+        'post': 'create',
     }))
 ]

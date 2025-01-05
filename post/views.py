@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status, permissions
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 
 # permission class import
@@ -20,7 +20,10 @@ from .models import (
 # 시리얼라이저 import
 from .serializers import (
     PostSerializer,
-    PostCategorySerializer, CommentSerializer, PostSimpleSerializer
+    PostCategorySerializer,
+    CommentSerializer,
+    PostSimpleSerializer,
+    ReportPostSerializer
 )
 
 # Create your views here.
@@ -97,4 +100,10 @@ class CommentViewSet(viewsets.ModelViewSet):
             return Response({"Error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class ReportPostViewSet(viewsets.ModelViewSet):
+    queryset = ReportPost.objects.all()
+    serializer_class = ReportPostSerializer
+    permission_classes = (IsAuthenticated,) # 로그인한 사용자만 신고할 수 있습니다.
+
 

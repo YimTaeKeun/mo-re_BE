@@ -81,3 +81,9 @@ class PostSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'category', 'title', 'author']
+
+# 신고 시리얼라이저
+class ReportPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReportPost
+        fields = '__all__'

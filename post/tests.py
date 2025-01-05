@@ -14,7 +14,7 @@ from .models import (
 
 # Create your tests here.
 
-ACCESS_TOKEN = 'bGStdjOJhBLn2-ZtZZFUrMujSQJUQnIPAAAAAQoqJRAAAAGUNf0E0-Q1KlcE_6bt'
+ACCESS_TOKEN = 'Y7jY0952Ba0P-dLTtA76u1gEeqXbs92VAAAAAQo8I-cAAAGUN2VZ_uQ1KlcE_6bt'
 
 class PostTests(TestCase):
     @classmethod
@@ -197,5 +197,36 @@ class PostTests(TestCase):
         response = self.client.get(f'/post/all/{id}/', headers=headers, content_type='application/json')
         print(response.json())
         self.assertEqual(response.status_code, 200)
+
+    def test_report(self):
+        headers = {'Authorization': 'Bearer ' + ACCESS_TOKEN}
+        # 카테고리 등록
+        headers = {'Authorization': 'Bearer ' + ACCESS_TOKEN}
+        PostCategory.objects.create(
+            categoryName='SimpleCategory',
+        )
+        # 포스트 등록
+        data = {
+            'title': 'test_report',
+            'content': 'test_report_content',
+            'category': 'SimpleCategory',
+            'bomb': {
+                'bombTime': '2025-01-05 12:32:00'
+            }
+        }
+        response = self.client.post('/post/detail/', data, headers=headers)
+        id = response.json().get('id') # 등록한 포스트의 아이디를 가져옵니다.
+        self.assertEqual(response.status_code, 201)
+        # 신고를 시작합니다.
+        # 인증되지 않은 사용자의 신고
+        data = {
+            'post': id,
+            'reason': "Test Reason"
+        }
+        response = self.client.post('/post/report/', data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # 인증된 사용자의 신고
+        response = self.client.post('/post/report/', data, headers=headers)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
 
