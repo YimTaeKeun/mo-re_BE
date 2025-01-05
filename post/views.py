@@ -2,6 +2,9 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
+# permission class import
+from usr.permissions import IsOwnerOrReadOnly
+
 # model import
 from .models import (
     BombPost,
@@ -20,8 +23,11 @@ from .serializers import (
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, ) # 사용자 인증된 사람만 create 할 수 있도록 합니다.
+    permission_classes = (IsOwnerOrReadOnly,
+                          permissions.IsAuthenticatedOrReadOnly) # 사용자 인증된 사람만 create 할 수 있도록 합니다.
     # 사용자 인증이 안된 사람은 읽기 권한만 가집니다. 이 권한은 추후 변경이 가능할 수 있습니다.
+    # POST 요청의 경우 IsAuthenticatedOrReadOnly의 has_permission만 따름
+    # 반면, PUT, DELETE 요청의 경우 has_permission 메소드와 함께, 오브젝트를 특정하기 때문에 has_object_permission 메소드도 함께 실행됩니다.
 
     def create(self, request, *args, **kwargs):
         if not request.user.is_authenticated: # 글쓴이가 없다면

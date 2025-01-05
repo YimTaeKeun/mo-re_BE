@@ -71,11 +71,6 @@ class PostTests(TestCase):
         print(response.json())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-
-        # DELETE TEst
-        response = self.client.delete('/post/detail/1/', headers=headers)
-        self.assertEqual(response.status_code, 204)
-
         # No Category Test
         data = {
             'title': 'test title',
@@ -90,8 +85,12 @@ class PostTests(TestCase):
 
         # Anonymous POST Test
         response = self.client.post('/post/detail/', data)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN) # IsAuthenticated에서 막힘
 
         # Anonymous PUT Test
         response = self.client.put('/post/detail/1/', data)
-        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN) # IsAuthenticated에서 막힘
+
+        # DELETE TEst
+        response = self.client.delete('/post/detail/1/', headers=headers)
+        self.assertEqual(response.status_code, 204)
