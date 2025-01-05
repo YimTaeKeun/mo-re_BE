@@ -76,3 +76,8 @@ class PostCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = PostCategory
         fields = '__all__'
+
+class PostSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['id', 'category', 'title', 'author']

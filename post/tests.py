@@ -161,4 +161,41 @@ class PostTests(TestCase):
         response = self.client.delete(f'/post/comment/{comment_id}/', headers=headers)
         self.assertEqual(response.status_code, 204)
 
+    def test_simple_post(self):
+        # 게시물 리스트를 가져오는 테스트 입니다.
+        # 카테고리 등록
+        headers = {'Authorization': 'Bearer ' + ACCESS_TOKEN}
+        PostCategory.objects.create(
+            categoryName='SimpleCategory',
+        )
+        PostCategory.objects.create(
+            categoryName='SimpleCategory2',
+        )
+        id = PostCategory.objects.get(categoryName='SimpleCategory').id
+        # 빈 리스트 테스트
+        response = self.client.get(f'/post/all/{id}/', headers=headers, content_type='application/json')
+        print(response.json())
+        self.assertEqual(response.status_code, 200)
+        # 포스트 2개 등록
+        data = {
+            'title': 'test',
+            'content': 'test',
+            'category': 'SimpleCategory',
+            'bomb': {
+                'bombTime': '2025-01-05 12:32:00'
+            }
+        }
+        response = self.client.post('/post/detail/', data, headers=headers)
+        self.assertEqual(response.status_code, 201)
+        response = self.client.post('/post/detail/', data, headers=headers)
+        self.assertEqual(response.status_code, 201)
+
+        data['category'] = 'SimpleCategory2'
+        response = self.client.post('/post/detail/', data, headers=headers)
+        self.assertEqual(response.status_code, 201)
+
+        response = self.client.get(f'/post/all/{id}/', headers=headers, content_type='application/json')
+        print(response.json())
+        self.assertEqual(response.status_code, 200)
+
 

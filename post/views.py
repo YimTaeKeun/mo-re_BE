@@ -20,7 +20,7 @@ from .models import (
 # 시리얼라이저 import
 from .serializers import (
     PostSerializer,
-    PostCategorySerializer, CommentSerializer
+    PostCategorySerializer, CommentSerializer, PostSimpleSerializer
 )
 
 # Create your views here.
@@ -63,7 +63,12 @@ class PostViewSet(viewsets.ModelViewSet):
 # TODO 시리얼라이저 재 매칭 필요
 class PostSimpleViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
-    serializer_class = PostSerializer
+    serializer_class = PostSimpleSerializer
+
+    def get_queryset(self):
+        # 카테고리 번호를 받습니다.
+        categoryId = self.kwargs.get('categoryId')
+        return Post.objects.filter(category=categoryId).all()
 
     def get(self, request, *args, **kwargs):
         # list 메소드는 여러 인스턴스를 반환하는 메소드이므로 simple viewset에 적합합니다.

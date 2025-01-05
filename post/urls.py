@@ -1,7 +1,9 @@
 from django.urls import path
 from .views import (
     PostViewSet,
-    PostCategoryViewSet, CommentViewSet
+    PostCategoryViewSet,
+    CommentViewSet,
+    PostSimpleViewSet
 )
 
 urlpatterns = [
@@ -31,5 +33,9 @@ urlpatterns = [
     path('comment/<int:pk>/', CommentViewSet.as_view({
         'delete': 'destroy',
         'put': 'partial_update',
+    })),
+    # 카테고리별 게시물 보기 end point
+    path('all/<int:categoryId>/', PostSimpleViewSet.as_view({
+        'get': 'list',
     }))
 ]
