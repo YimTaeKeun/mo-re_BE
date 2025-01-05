@@ -32,7 +32,7 @@ class ReportPost(models.Model):
 
 class Comment(models.Model):
     # id: pk이며, 댓글 번호를 의미합니다.
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     content = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     addDate = models.DateTimeField(auto_now_add=True)
