@@ -30,3 +30,9 @@ class ReportPost(models.Model):
     post = models.OneToOneField(Post, on_delete=models.CASCADE) # 신고당한 post를 의미하며 pk를 받아옵니다.
     addDate = models.DateTimeField(auto_now_add=True) # 신고 등록 날짜를 의미하며, 자동으로 시간이 등록됩니다.
 
+class Comment(models.Model):
+    # id: pk이며, 댓글 번호를 의미합니다.
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    content = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    addDate = models.DateTimeField(auto_now_add=True)
