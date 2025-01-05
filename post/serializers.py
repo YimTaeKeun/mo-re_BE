@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+
 from .models import (
     Post,
     PostCategory,
@@ -6,10 +8,16 @@ from .models import (
     ReportPost
 )
 
+class BombPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BombPost
+        fields = ['bombTime']
+
 class PostSerializer(serializers.ModelSerializer):
+    bomb = BombPostSerializer(required=False) # bomb time이 설정되지 않는 경우를 위해 required는 false로 지정
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'bomb'] # bomb는 relation name으로 포스트와 연결된 폭탄 스케쥴을 말합니다.
+        fields = ['id', 'title', 'content', 'author', 'category', 'bomb'] # bomb는 relation name으로 포스트와 연결된 폭탄 스케쥴을 말합니다.
 
     def create(self, validated_data):
         """
@@ -38,17 +46,16 @@ class PostSerializer(serializers.ModelSerializer):
         # 만약에 폭탄 스케줄 수정이 일어난다면, 데이터를 추출합니다.
         bomb = validated_data.get('bomb', None)
         # bomb 리스트에 해당 게시물이 있었는지 없었는지 파악을 합니다.
-        try:
-            BombPost.objects.get(targetPost=instance)
-            # 폭탄 리스트에 등록되어 있었던 경우
-            # instance 즉, 게시물의  relation name인 bomb를 통해 접근합니다.
-            instance.bomb.bombTime = bomb.get('bombTime', instance.bomb.bombTime)
-        except Post.DoesNotExist: # 폭탄 리스트에 등록되어 있지 않는 경우
-            BombPost.objects.create(targetPost=instance, **bomb) # 폭탄 리스트에 등록합니다.
+        if bomb is not None: # bomb 데이터가 있는 경우
+            try:
+                bomb_instance = BombPost.objects.get(targetPost=instance)
+                # 폭탄 리스트에 등록되어 있었던 경우
+                # 폭탄 시리얼라이저를 통해서 저장합니다. 일부 저장은 true
+                serializer = BombPostSerializer(bomb_instance, data=bomb, partial=True)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+            except Post.DoesNotExist: # 폭탄 리스트에 등록되어 있지 않는 경우
+                BombPost.objects.create(targetPost=instance, **bomb) # 폭탄 리스트에 등록합니다.
 
         return instance
 
-class BombPostSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BombPost
-        fields = ['bombTime']
