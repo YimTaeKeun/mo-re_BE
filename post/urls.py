@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     PostViewSet,
-    PostCategoryViewSet
+    PostCategoryViewSet, CommentViewSet
 )
 
 urlpatterns = [
@@ -22,5 +22,14 @@ urlpatterns = [
         'get': 'retrieve',
         'put': 'update',
         'delete': 'destroy',
+    })),
+    # 댓글 저장 end point
+    path('comment/save/', CommentViewSet.as_view({
+        'post': 'create',
+    })),
+    # 댓글 삭제, 수정 end point
+    path('comment/<int:pk>/', CommentViewSet.as_view({
+        'delete': 'destroy',
+        'put': 'partial_update',
     }))
 ]

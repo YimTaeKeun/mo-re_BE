@@ -5,13 +5,20 @@ from .models import (
     Post,
     PostCategory,
     BombPost,
-    ReportPost
+    ReportPost,
+    Comment
 )
 
 class BombPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = BombPost
         fields = ['bombTime']
+
+# 댓글 시리얼라이저
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = '__all__'
 
 class PostSerializer(serializers.ModelSerializer):
     bomb = BombPostSerializer(required=False) # bomb time이 설정되지 않는 경우를 위해 required는 false로 지정
@@ -58,6 +65,12 @@ class PostSerializer(serializers.ModelSerializer):
                 BombPost.objects.create(targetPost=instance, **bomb) # 폭탄 리스트에 등록합니다.
 
         return instance
+
+    def to_representation(self, instance):
+        # 댓글을 제외한 나머지 필드들은 상위 클래스의 to_representation을 통해서 시리얼라이징된 데이터를 얻습니다.
+        data = super().to_representation(instance)
+        data['comments'] = CommentSerializer(instance.comments.all(), many=True).data # relatedName을 통해 댓글 들을 얻습니다.
+        return data
 
 class PostCategorySerializer(serializers.ModelSerializer):
     class Meta:

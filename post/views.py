@@ -1,5 +1,6 @@
 from rest_framework import viewsets, status, permissions
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 # permission class import
@@ -13,12 +14,13 @@ from .models import (
     BombPost,
     Post,
     PostCategory,
-    ReportPost
+    ReportPost,
+    Comment
 )
 # 시리얼라이저 import
 from .serializers import (
     PostSerializer,
-    PostCategorySerializer
+    PostCategorySerializer, CommentSerializer
 )
 
 # Create your views here.
@@ -28,7 +30,7 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = (IsOwnerOrReadOnly,
-                          permissions.IsAuthenticatedOrReadOnly) # 사용자 인증된 사람만 create 할 수 있도록 합니다.
+                          IsAuthenticatedOrReadOnly) # 사용자 인증된 사람만 create 할 수 있도록 합니다.
     # 사용자 인증이 안된 사람은 읽기 권한만 가집니다. 이 권한은 추후 변경이 가능할 수 있습니다.
     # POST 요청의 경우 IsAuthenticatedOrReadOnly의 has_permission만 따름
     # 반면, PUT, DELETE 요청의 경우 has_permission 메소드와 함께, 오브젝트를 특정하기 때문에 has_object_permission 메소드도 함께 실행됩니다.
@@ -73,4 +75,21 @@ class PostCategoryViewSet(viewsets.ModelViewSet):
     serializer_class = PostCategorySerializer
     permission_classes = (IsStaffOrReadOnly,) # 관리자 권한을 가진 사용자만 카테고리를 등록, 삭제, 수정할 수 있습니다.
 
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = (IsOwnerOrReadOnly, # delte, put만 작성자와 수정자가 일치해야함
+                          IsAuthenticatedOrReadOnly) # create는 작성자가 있어야만 가능, GET은 읽기만 가능
+
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy() # data 카피
+        data['author'] = request.user.pk # 유저 pk로 갈아 끼우기
+        # post는 요청 당시부터 번호로 요청을 받습니다.
+        serializer = self.get_serializer(data=data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as e: # 형식에 맞지않는 잘못된 요청이 들어온 경우
+            return Response({"Error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
