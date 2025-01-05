@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.test import TestCase
+from rest_framework import status
 
 from usr.models import User
 from .models import (
@@ -53,7 +54,7 @@ class PostTests(TestCase):
         print(response.json())
         self.assertEqual(response.status_code, 200)
 
-        # PUT Test # TODO Put 오류
+        # PUT Test
         data = {
             'bomb': {
                 'bombTime': '2025-01-05 14:23:43'
@@ -63,6 +64,25 @@ class PostTests(TestCase):
         print(response.json())
         self.assertEqual(response.status_code, 200)
 
+        # TODO 퍼미션 부여
+        # Anonymous User Test
+        # response = self.client.get('/post/detail/1/')
+        # print(response.json())
+        # self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
         # DELETE TEst
         response = self.client.delete('/post/detail/1/', headers=headers)
         self.assertEqual(response.status_code, 204)
+
+        # No Category Test
+        data = {
+            'title': 'test title',
+            'content': 'test content',
+            'category': 'TestCategory1',
+            'bomb': {
+                'bombTime': '2025-01-05 12:32:00'
+            }
+        }
+        response = self.client.post('/post/detail/', data, headers=headers)
+        self.assertEqual(response.status_code, 404)
