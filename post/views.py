@@ -30,7 +30,6 @@ class PostViewSet(viewsets.ModelViewSet):
         data = request.data.copy() # request 데이터를 변환할 수는 없으므로 복제를 하여 변환을 시도합니다.
 
         try:
-            # TODO 카테고리 이름 unique로 설정
             # 이름으로 들어온 카테고리를 그 이름에 대응되는 pk값으로 변환하여 저장합니다.
             data['category'] = PostCategory.objects.get(categoryName=data['category']).pk
         except PostCategory.DoesNotExist: # 카테고리가 존재하지 않는다면

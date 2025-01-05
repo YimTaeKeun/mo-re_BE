@@ -7,7 +7,7 @@ from usr.models import User
 
 class PostCategory(models.Model):
     # id: 해당 모델의 pk로 카테고리 번호로 활용됩니다.
-    categoryName = models.CharField(max_length=50) # 카테고리 이름을 의미합니다.
+    categoryName = models.CharField(max_length=50, unique=True) # 카테고리 이름을 의미합니다.
     addDate = models.DateTimeField(auto_now_add=True) # 카테고리 추가 날짜와 시간을 의미합니다.
 
 class Post(models.Model):
