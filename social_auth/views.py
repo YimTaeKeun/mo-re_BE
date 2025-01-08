@@ -100,3 +100,27 @@ class RefreshTokens(viewsets.ViewSet):
             return Response(response.json(), status=status.HTTP_200_OK)
         # 만일 토큰 정보가 잘못되었거나, refresh_token마저 만료 된경우, 혹은 카카오 측 오류인 경우
         return Response({"Error": response.text}, status=status.HTTP_400_BAD_REQUEST)
+
+class LogoutView(viewsets.ViewSet):
+    """
+    로그아웃 뷰 입니다.
+    액세스 토큰을 만료 시키는 기능입니다.
+    """
+    def create(self, request):
+        """
+        post 형식으로 진행하며, body에는 access_token 정보만 넘어옵니다.
+        """
+        kakao_logout_url = 'https://kapi.kakao.com/v1/user/logout'
+        headers = {
+            'Authorization': 'Bearer ' + request.auth, # request.auth는 인증 과정에서 반환된 access_token을 말합니다.
+        }
+        data = {
+            'target_id_type': 'user_id',
+            'target_id': request.user.sub, # 액세스 토큰을 통해서 얻어온 정보를
+        }
+        response = requests.post(kakao_logout_url, data=data, headers=headers) # 카카오에 로그아웃을 요청합니다. 즉, 액세스 토큰 만료를 요청합니다.
+        if response.status_code == 200:
+            logger.info('회원번호 ' + str(request.user.sub) + '이(가) 로그아웃 하였습니다.')
+            return Response({"Message", "Success Logout"}, status=status.HTTP_200_OK)
+        logger.warning(response.text) # 오류 정보를 서버에 띄웁니다.
+        return Response({"Error", response.json()}, status=status.HTTP_400_BAD_REQUEST)
