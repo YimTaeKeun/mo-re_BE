@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import KakaoCallback, RefreshTokens
+from .views import KakaoCallback, RefreshTokens, LogoutView
 
 # url 패턴을 지정합니다. BaseUrl/socialLogin/
 urlpatterns = [
@@ -8,4 +8,8 @@ urlpatterns = [
     path('kakaoRefresh/', RefreshTokens.as_view({
         'post': 'create'
     }), name='kakao_refresh'),
+    # 카카오 로그아웃 함수 매핑
+    path('kakaoLogout/', LogoutView.as_view({
+        'post': 'create'
+    }), name='kakao_logout'),
 ]
