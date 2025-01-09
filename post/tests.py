@@ -14,7 +14,7 @@ from .models import (
 
 # Create your tests here.
 
-ACCESS_TOKEN = 'Y7jY0952Ba0P-dLTtA76u1gEeqXbs92VAAAAAQo8I-cAAAGUN2VZ_uQ1KlcE_6bt'
+ACCESS_TOKEN = 'DcuwEIzPmYKF9xPVvAei5i5iOne8MQc2AAAAAQoqJVEAAAGUS65SweQ1KlcE_6bt'
 
 class PostTests(TestCase):
     @classmethod
@@ -192,6 +192,14 @@ class PostTests(TestCase):
 
         data['category'] = 'SimpleCategory2'
         response = self.client.post('/post/detail/', data, headers=headers)
+        self.assertEqual(response.status_code, 201)
+
+        # 댓글 등록 -> simple view의 comment_count의 test 위함
+        data = {
+            'post': 1,
+            'content': '댓글 내용',
+        }
+        response = self.client.post('/post/comment/save/', data, headers=headers)
         self.assertEqual(response.status_code, 201)
 
         response = self.client.get(f'/post/all/{id}/', headers=headers, content_type='application/json')
