@@ -85,6 +85,7 @@ class PostSimpleSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data['comment_count'] = instance.comments.count()
+        data['author'] = instance.author.username
         return data
 
 # 신고 시리얼라이저
