@@ -1,12 +1,15 @@
 from rest_framework.permissions import BasePermission
 from rest_framework import permissions
 from usr.models import BlackListUser
+import logging
+logger = logging.getLogger('django')
 
 
 # 블랙리스트 유저 검사 로직
 def checkBlackList(sub):
     try:
-        BlackListUser.objects.get(sub=sub)
+        user = BlackListUser.objects.get(sub=sub)
+        logger.info('차단됨. 사유: ' + user.reason)
         return True # 블랙리스트에 속함
     except BlackListUser.DoesNotExist:
         return False # 블랙리스트에 있지않아 False로 반환
@@ -38,3 +41,23 @@ class IsStaffOrReadOnly(BasePermission):
              (not isBlack) and  # 블랙리스트에 속하는 유저가 아니라면
             request.user.is_staff) # 그 인증된 사용자가 관리자인가
         )
+
+# 블랙리스트가 아닌 사람만 DB에 관여할 수 있으며, 모든 사람은 읽기 권한을 가집니다.
+class IsNotBlackAndAuthenticatedOrReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        isBlack = False
+        if request.user.is_authenticated: isBlack = checkBlackList(request.user.sub)
+        if isBlack:
+            logger.info('회원번호 ' + str(request.user.sub) + ' 회원명 ' + str(request.user.username) + '이(가) 블랙리스트 유저로서 접근 차단되었습니다.')
+        return bool(
+            request.method in permissions.SAFE_METHODS or  # 읽기와 같은 안전모드에 있으면 통과
+            (request.user and request.user.is_authenticated and  # 인증된 사용자인가
+             (not isBlack)) # 블랙리스트에 속하는 유저가 아니라면
+        )
+
+# 블랙리스트에 등록되어 있는 사람 제외 모든 사람에게 허용되는 권한입니다.
+class IsNotBlack(BasePermission):
+    def has_permission(self, request, view):
+        isBlack = False
+        if request.user.is_authenticated: isBlack = checkBlackList(request.user.sub)
+        return bool(not isBlack) # 블랙리스트 아닌 사람만 혀용이 가능합니다.

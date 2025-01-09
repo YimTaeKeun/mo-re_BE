@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from usr.permissions import (
     IsOwnerOrReadOnly,
     IsStaffOrReadOnly,
+    IsNotBlackAndAuthenticatedOrReadOnly,
+    IsNotBlack
 )
 
 # model import
@@ -33,7 +35,7 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = (IsOwnerOrReadOnly,
-                          IsAuthenticatedOrReadOnly) # 사용자 인증된 사람만 create 할 수 있도록 합니다.
+                          IsNotBlackAndAuthenticatedOrReadOnly, ) # 사용자 인증된 사람만 create 할 수 있도록 합니다.
     # 사용자 인증이 안된 사람은 읽기 권한만 가집니다. 이 권한은 추후 변경이 가능할 수 있습니다.
     # POST 요청의 경우 IsAuthenticatedOrReadOnly의 has_permission만 따름
     # 반면, PUT, DELETE 요청의 경우 has_permission 메소드와 함께, 오브젝트를 특정하기 때문에 has_object_permission 메소드도 함께 실행됩니다.
@@ -63,10 +65,11 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 
-# TODO 시리얼라이저 재 매칭 필요
+
 class PostSimpleViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSimpleSerializer
+    permission_classes = (IsNotBlack, ) # 블랙 리스트에 있는 사람은 게시물 조회도 불가합니다.
 
     def get_queryset(self):
         # 카테고리 번호를 받습니다.
@@ -87,7 +90,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = (IsOwnerOrReadOnly, # delte, put만 작성자와 수정자가 일치해야함
-                          IsAuthenticatedOrReadOnly) # create는 작성자가 있어야만 가능, GET은 읽기만 가능
+                          IsNotBlackAndAuthenticatedOrReadOnly) # create는 작성자가 있어야만 가능, GET은 읽기만 가능
 
     def create(self, request, *args, **kwargs):
         data = request.data.copy() # data 카피
@@ -104,6 +107,6 @@ class CommentViewSet(viewsets.ModelViewSet):
 class ReportPostViewSet(viewsets.ModelViewSet):
     queryset = ReportPost.objects.all()
     serializer_class = ReportPostSerializer
-    permission_classes = (IsAuthenticated,) # 로그인한 사용자만 신고할 수 있습니다.
-
+    permission_classes = (IsAuthenticated, # 로그인한 사용자만 신고할 수 있습니다.
+                          IsNotBlackAndAuthenticatedOrReadOnly) # 블랙리스트가 아닌 사용자만 신고 가능합니다.
 
