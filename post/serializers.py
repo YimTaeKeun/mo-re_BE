@@ -82,6 +82,11 @@ class PostSimpleSerializer(serializers.ModelSerializer):
         model = Post
         fields = ['id', 'category', 'title', 'author']
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['comment_count'] = instance.comments.count()
+        return data
+
 # 신고 시리얼라이저
 class ReportPostSerializer(serializers.ModelSerializer):
     class Meta:
