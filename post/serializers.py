@@ -74,6 +74,7 @@ class PostSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         # 댓글을 제외한 나머지 필드들은 상위 클래스의 to_representation을 통해서 시리얼라이징된 데이터를 얻습니다.
         data = super().to_representation(instance)
+        data['author_name'] = instance.author.username # 유저 닉네임을 추가합니다.
         data['comments'] = CommentSerializer(instance.comments.all(), many=True).data # relatedName을 통해 댓글 들을 얻습니다.
         return data
 
