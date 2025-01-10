@@ -20,6 +20,11 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = '__all__'
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance) # 상위 클래스로부터 시리얼라이징 된 데이터를 가져옵니다.
+        data['author_name'] = instance.author.username # username을 반환합니다.
+        return data
+
 class PostSerializer(serializers.ModelSerializer):
     bomb = BombPostSerializer(required=False) # bomb time이 설정되지 않는 경우를 위해 required는 false로 지정
     class Meta:
