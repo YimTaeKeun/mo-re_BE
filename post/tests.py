@@ -3,6 +3,7 @@ from datetime import datetime
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.status import HTTP_403_FORBIDDEN
+from usr.tests import ACCESS_TOKEN # 액세스 토큰을 가져옵니다.
 
 from usr.models import User
 from .models import (
@@ -14,7 +15,6 @@ from .models import (
 
 # Create your tests here.
 
-ACCESS_TOKEN = 'DcuwEIzPmYKF9xPVvAei5i5iOne8MQc2AAAAAQoqJVEAAAGUS65SweQ1KlcE_6bt'
 
 class PostTests(TestCase):
     @classmethod
