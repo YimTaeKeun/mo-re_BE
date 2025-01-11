@@ -10,6 +10,9 @@ class PostCategory(models.Model):
     categoryName = models.CharField(max_length=50, unique=True) # 카테고리 이름을 의미합니다.
     addDate = models.DateTimeField(auto_now_add=True) # 카테고리 추가 날짜와 시간을 의미합니다.
 
+    def __str__(self):
+        return self.categoryName # 카테고리 이름을 객체 이름으로 설정합니다.
+
 class Post(models.Model):
     # id: pk로 포스트 번호로 활용됩니다.
     title = models.CharField(max_length=120) # 포스트 제목을 말합니다.
@@ -17,6 +20,8 @@ class Post(models.Model):
     addDate = models.DateTimeField(auto_now_add=True) # 포스트 추가 날짜와 시간을 말하며 자동으로 추가됩니다.
     author = models.ForeignKey(User, on_delete=models.CASCADE) # 포스트 작성자를 말하며 User의 pk를 받아옵니다.
     category = models.ForeignKey(PostCategory, on_delete=models.CASCADE) # 해당 포스트가 속한 카테고리르 말하며 카테고리 모델의 pk를 받아옵니다.
+    def __str__(self):
+        return self.title # 제목을 객체 이름으로 설정합니다.
 
 class BombPost(models.Model):
     # id: pk이며, 폭파 번호를 의미합니다.
@@ -36,3 +41,5 @@ class Comment(models.Model):
     content = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     addDate = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.author.username # 사용자 닉네임을 객체 명으로 잡습니다.

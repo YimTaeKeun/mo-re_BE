@@ -20,6 +20,11 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = '__all__'
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance) # 상위 클래스로부터 시리얼라이징 된 데이터를 가져옵니다.
+        data['author_name'] = instance.author.username # username을 반환합니다.
+        return data
+
 class PostSerializer(serializers.ModelSerializer):
     bomb = BombPostSerializer(required=False) # bomb time이 설정되지 않는 경우를 위해 required는 false로 지정
     class Meta:
@@ -69,6 +74,7 @@ class PostSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         # 댓글을 제외한 나머지 필드들은 상위 클래스의 to_representation을 통해서 시리얼라이징된 데이터를 얻습니다.
         data = super().to_representation(instance)
+        data['author_name'] = instance.author.username # 유저 닉네임을 추가합니다.
         data['comments'] = CommentSerializer(instance.comments.all(), many=True).data # relatedName을 통해 댓글 들을 얻습니다.
         return data
 
