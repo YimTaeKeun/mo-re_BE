@@ -1,0 +1,90 @@
+#version: '3'
+
+services:
+  db:
+    image: mysql:latest
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app_network
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - app_network
+
+  mo-re_worker:
+    image: ytk030305/mo-re_be:1.0.3
+    command: celery -A config worker -l INFO
+#    volumes:
+#      - .:/code
+    depends_on:
+      - db
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    networks:
+      - app_network
+
+  mo-re_beat: # celery beat 설정
+    image: ytk030305/mo-re_be:1.0.3
+    command: celery -A config beat -l INFO
+#    volumes:
+#      - .:/code
+    depends_on:
+      - db # mysql이 없으면 돌아가지 않음
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    networks:
+      - app_network
+
+  migrations:
+    image: ytk030305/mo-re_be:1.0.3
+    command: sh entrypoint.sh
+#    volumes:
+#      - .:/code
+    depends_on:
+      - db
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    networks:
+      - app_network
+
+  mo-re_api: # api 컨테이너
+    image: ytk030305/mo-re_be:1.0.3
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+#    volumes:
+#      - .:/code
+    depends_on:
+      - db
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    networks:
+      - app_network
+
+volumes:
+  db_data:
+  static_volume:
+
+networks:
+  app_network:
+    driver: bridge
