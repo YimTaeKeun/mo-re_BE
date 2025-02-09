@@ -14,6 +14,8 @@ def KakaoCallback(request):
     # code는 카카오에서 제공받은 인가코드를 말합니다.
     code = request.GET.get('code', None) # url 쿼리 파라미터로부터 code를 가져옵니다.
     redirect_uri = request.GET.get('redirect_uri', None) # url 퀴리 파라미터로 redirect_uri를 가져옵니다.
+    if redirect_uri is not None:
+        redirect_uri += '/socialLogin/kakaoCallback/'
     # 인가 코드가 추출되지 않는 경우 예외 처리
     if code is None:
         return JsonResponse({"Error": "인가 코드 추출 실패"}, status=status.HTTP_400_BAD_REQUEST)
