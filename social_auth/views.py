@@ -13,12 +13,14 @@ logger = logging.getLogger('django') # 로거 설정
 def KakaoCallback(request):
     # code는 카카오에서 제공받은 인가코드를 말합니다.
     code = request.GET.get('code', None) # url 쿼리 파라미터로부터 code를 가져옵니다.
+    redirect_uri = request.GET.get('redirect_uri', None) # url 퀴리 파라미터로 redirect_uri를 가져옵니다.
     # 인가 코드가 추출되지 않는 경우 예외 처리
     if code is None:
         return JsonResponse({"Error": "인가 코드 추출 실패"}, status=status.HTTP_400_BAD_REQUEST)
     # 토큰을 발급받기위한 요청 url 입니다.
     token_url = 'https://kauth.kakao.com/oauth/token'
-    redirect_uri = CLIENT_BASE_URL + '/socialLogin/kakaoCallback/' # 인가 코드가 들어오는 url 즉 현 뷰의 url을 말합니다.
+    # redirect_uri를 고정 시켜놓으면 안됩니다. 따라서 아래 코드는 차단
+    # redirect_uri = CLIENT_BASE_URL + '/socialLogin/kakaoCallback/' # 인가 코드가 들어오는 url 즉 현 뷰의 url을 말합니다.
     # 요청 body
     data = {
         'grant_type': 'authorization_code',
